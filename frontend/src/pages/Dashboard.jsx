@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const BASE_URL = "https://ttm-production-3f32.up.railway.app";
+
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
@@ -10,27 +12,27 @@ export default function Dashboard() {
   }, []);
 
   const fetchTasks = async (status = "") => {
-  try {
-    const url = status
-      ? `https://ttm-production-bef9.up.railway.app/api/tasks?status=${status}`
-      : `https://ttm-production-bef9.up.railway.app/api/tasks`;
+    try {
+      const url = status
+        ? `${BASE_URL}/api/tasks?status=${status}`
+        : `${BASE_URL}/api/tasks`;
 
-    const res = await fetch(url, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
+      const res = await fetch(url, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
-    const data = await res.json();
-    setTasks(data);
-  } catch (err) {
-    console.log(err);
-  }
-};
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const createTask = async () => {
     try {
-      await fetch("https://ttm-production-bef9.up.railway.app/api/tasks", {
+      await fetch(`${BASE_URL}/api/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,17 +51,14 @@ export default function Dashboard() {
 
   const updateStatus = async (id) => {
     try {
-      await fetch(
-        `https://ttm-production-bef9.up.railway.app/api/tasks/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ status: "done" }),
-        }
-      );
+      await fetch(`${BASE_URL}/api/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ status: "done" }),
+      });
 
       fetchTasks();
     } catch (err) {
@@ -67,18 +66,14 @@ export default function Dashboard() {
     }
   };
 
-  // 🔥 STEP 2: DELETE FUNCTION
   const deleteTask = async (id) => {
     try {
-      await fetch(
-        `https://ttm-production-bef9.up.railway.app/api/tasks/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
+      await fetch(`${BASE_URL}/api/tasks/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
       fetchTasks();
     } catch (err) {
@@ -89,23 +84,25 @@ export default function Dashboard() {
   return (
     <div style={{ padding: 20 }}>
       <h2>Dashboard</h2>
+
+      {/* FILTER BUTTONS */}
       <div style={{ marginBottom: 20 }}>
-  <button onClick={() => fetchTasks("")}>All</button>
+        <button onClick={() => fetchTasks("")}>All</button>
 
-  <button
-    onClick={() => fetchTasks("todo")}
-    style={{ marginLeft: "10px" }}
-  >
-    Todo
-  </button>
+        <button
+          onClick={() => fetchTasks("todo")}
+          style={{ marginLeft: "10px" }}
+        >
+          Todo
+        </button>
 
-  <button
-    onClick={() => fetchTasks("done")}
-    style={{ marginLeft: "10px" }}
-  >
-    Done
-  </button>
-</div>
+        <button
+          onClick={() => fetchTasks("done")}
+          style={{ marginLeft: "10px" }}
+        >
+          Done
+        </button>
+      </div>
 
       {/* CREATE TASK */}
       <div style={{ marginBottom: 20 }}>
@@ -143,12 +140,10 @@ export default function Dashboard() {
             <p>{task.description}</p>
             <p>Status: {task.status}</p>
 
-            {/* Step 1 */}
             <button onClick={() => updateStatus(task._id)}>
               Mark Done
             </button>
 
-            {/* Step 2 */}
             <button
               onClick={() => deleteTask(task._id)}
               style={{ marginLeft: "10px" }}
